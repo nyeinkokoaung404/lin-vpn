@@ -3,95 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP User Manager</title>
+    <title>Lin-VPN User Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loading { opacity: 0.5; pointer-events: none; }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-        <h1 class="text-2xl font-bold mb-4 text-blue-600">VIP User Manager</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-blue-50 rounded">
-            <input type="password" id="ghToken" placeholder="GitHub Personal Access Token" class="border p-2 rounded w-full">
-            <input type="text" id="repoPath" placeholder="username/repo/path/to/users.json" class="border p-2 rounded w-full">
-            <button onclick="fetchUsers()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Load Data</button>
-        </div>
-
-        <hr class="my-6">
-
-        <div class="mb-6 border-b pb-6">
-            <h2 class="text-lg font-semibold mb-3">Add New VIP</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <input type="text" id="newName" placeholder="Name" class="border p-2 rounded">
-                <input type="text" id="newHwid" placeholder="HWID" class="border p-2 rounded">
-                <input type="date" id="newExp" class="border p-2 rounded">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-8 border-b border-slate-700 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-400">Lin-VPN Admin</h1>
+                <p class="text-slate-400 text-sm">Managing: nyeinkokoaung404/lin-vpn</p>
             </div>
-            <button onclick="addUser()" class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full md:w-auto">Add to List</button>
+            <div id="statusTag" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-700">Offline</div>
         </div>
 
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="p-2 border">Name</th>
-                    <th class="p-2 border">HWID</th>
-                    <th class="p-2 border">Expiry</th>
-                    <th class="p-2 border">Action</th>
-                </tr>
-            </thead>
-            <tbody id="userTableBody">
-                </tbody>
-        </table>
+        <div id="authSection" class="bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700 mb-6">
+            <h2 class="text-lg font-semibold mb-4 text-blue-300">1. GitHub Connection</h2>
+            <div class="flex flex-col md:flex-row gap-4">
+                <input type="password" id="ghToken" placeholder="Enter GitHub Personal Access Token" 
+                    class="flex-1 bg-slate-700 border border-slate-600 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="fetchUsers()" id="loadBtn" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-bold transition">
+                    Connect & Fetch Data
+                </button>
+            </div>
+            <p class="mt-2 text-xs text-slate-500 italic">* Token ကို GitHub Settings > Developer Settings ထဲမှာ 'Contents: Write' permission နဲ့ယူပါ။</p>
+        </div>
 
-        <div class="mt-6">
-            <button onclick="saveToGithub()" id="saveBtn" class="hidden bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 w-full shadow-lg">
-                Save Changes to GitHub
-            </button>
+        <div id="mainDashboard" class="hidden">
+            <div class="bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700 mb-6">
+                <h2 class="text-lg font-semibold mb-4 text-green-400">2. Add New VIP User</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="newName" placeholder="User Name" class="bg-slate-700 border border-slate-600 p-3 rounded-lg">
+                    <input type="text" id="newHwid" placeholder="Hardware ID (HWID)" class="bg-slate-700 border border-slate-600 p-3 rounded-lg">
+                    <input type="date" id="newExp" class="bg-slate-700 border border-slate-600 p-3 rounded-lg">
+                </div>
+                <button onclick="addUser()" class="mt-4 w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-bold transition">
+                    Add to Temporary List
+                </button>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl shadow-xl border border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-700 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-orange-400">3. User List & Sync</h2>
+                    <button onclick="saveToGithub()" id="saveBtn" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-bold transition shadow-lg animate-pulse">
+                        Update GitHub File
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-700 text-slate-300 uppercase text-xs">
+                            <tr>
+                                <th class="p-4">Name</th>
+                                <th class="p-4">HWID</th>
+                                <th class="p-4">Expiration</th>
+                                <th class="p-4 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody" class="divide-y divide-slate-700">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        const REPO_PATH = "nyeinkokoaung404/lin-vpn/contents/users.json";
         let userData = { vip_users: [] };
         let currentSha = "";
 
-        // ၁။ GitHub မှ Data ဖတ်ခြင်း
+        // GitHub ကနေ Data ဆွဲယူခြင်း
         async function fetchUsers() {
             const token = document.getElementById('ghToken').value;
-            const repoPath = document.getElementById('repoPath').value; 
-            const url = `https://api.github.com/repos/${repoPath}`;
+            if(!token) return alert("Please enter token!");
 
+            const btn = document.getElementById('loadBtn');
+            btn.innerText = "Connecting...";
+            
             try {
-                const response = await fetch(url, {
+                const response = await fetch(`https://api.github.com/repos/${REPO_PATH}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+
+                if(!response.ok) throw new Error("Check your token or repo path.");
+
                 const data = await response.json();
                 currentSha = data.sha;
-                userData = JSON.parse(atob(data.content)); // Base64 decode
+                const content = JSON.parse(atob(data.content)); // Decode base64
+                userData = content;
+
                 renderTable();
-                document.getElementById('saveBtn').classList.remove('hidden');
-                alert("Data Loaded!");
+                document.getElementById('mainDashboard').classList.remove('hidden');
+                document.getElementById('statusTag').innerText = "Online";
+                document.getElementById('statusTag').className = "px-3 py-1 rounded-full text-xs font-bold bg-green-900 text-green-300";
+                btn.innerText = "Data Refreshed";
             } catch (err) {
-                alert("Error fetching data. Check your token and repo path.");
+                alert("Error: " + err.message);
+                btn.innerText = "Try Again";
             }
         }
 
-        // ၂။ Table ထဲမှာ User List ပြခြင်း
+        // Table ကို Update လုပ်ခြင်း
         function renderTable() {
             const tbody = document.getElementById('userTableBody');
             tbody.innerHTML = "";
             userData.vip_users.forEach((user, index) => {
                 tbody.innerHTML += `
-                    <tr>
-                        <td class="p-2 border">${user.name}</td>
-                        <td class="p-2 border">${user.hwid}</td>
-                        <td class="p-2 border">${user.exp_date}</td>
-                        <td class="p-2 border text-center">
-                            <button onclick="deleteUser(${index})" class="text-red-500 hover:underline">Delete</button>
+                    <tr class="hover:bg-slate-700/50 transition">
+                        <td class="p-4 font-medium">${user.name}</td>
+                        <td class="p-4 font-mono text-xs text-slate-400">${user.hwid}</td>
+                        <td class="p-4"><span class="bg-slate-900 px-2 py-1 rounded border border-slate-600 text-sm">${user.exp_date}</span></td>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteUser(${index})" class="text-red-400 hover:text-red-200">Remove</button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        // ၃။ User အသစ်ထည့်ခြင်း (Local list ထဲကိုပဲ အရင်ထည့်တာ)
+        // User အသစ်ထည့်ခြင်း
         function addUser() {
             const name = document.getElementById('newName').value;
             const hwid = document.getElementById('newHwid').value;
@@ -100,45 +132,58 @@
             if (name && hwid && exp) {
                 userData.vip_users.push({ hwid, name, exp_date: exp });
                 renderTable();
-                // Clear inputs
                 document.getElementById('newName').value = '';
                 document.getElementById('newHwid').value = '';
             } else {
-                alert("Please fill all fields");
+                alert("All fields are required!");
             }
         }
 
-        // ၄။ User ဖျက်ခြင်း
+        // User ဖျက်ခြင်း
         function deleteUser(index) {
-            userData.vip_users.splice(index, 1);
-            renderTable();
+            if(confirm("Confirm delete?")) {
+                userData.vip_users.splice(index, 1);
+                renderTable();
+            }
         }
 
-        // ၅။ GitHub ဆီ Data ပြန်ပို့သိမ်းဆည်းခြင်း
+        // GitHub ဆီ တကယ်သွားသိမ်းခြင်း
         async function saveToGithub() {
             const token = document.getElementById('ghToken').value;
-            const repoPath = document.getElementById('repoPath').value;
-            const url = `https://api.github.com/repos/${repoPath}`;
+            const btn = document.getElementById('saveBtn');
+            
+            if(!confirm("Are you sure you want to update the live users.json file?")) return;
 
-            const response = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: "Update users via Admin Panel",
-                    content: btoa(JSON.stringify(userData, null, 2)),
-                    sha: currentSha
-                })
-            });
+            btn.innerText = "Syncing...";
+            btn.classList.add('loading');
 
-            if (response.ok) {
-                const updatedData = await response.json();
-                currentSha = updatedData.content.sha; // Update SHA for next edit
-                alert("Successfully saved to GitHub!");
-            } else {
-                alert("Failed to save. Error: " + response.statusText);
+            try {
+                const response = await fetch(`https://api.github.com/repos/${REPO_PATH}`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: "Updated via Lin-VPN Admin Dashboard",
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(userData, null, 2)))), // Encode to base64 safely
+                        sha: currentSha
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    currentSha = result.content.sha; // Update the new SHA for next edit
+                    alert("Success! users.json has been updated on GitHub.");
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message);
+                }
+            } catch (err) {
+                alert("Failed to save: " + err.message);
+            } finally {
+                btn.innerText = "Update GitHub File";
+                btn.classList.remove('loading');
             }
         }
     </script>
