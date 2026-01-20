@@ -1,14 +1,1 @@
-{
-  "vip_users": [
-    {
-      "hwid": "105124d591ddfbb7",
-      "name": "404",
-      "exp_date": "2026-01-19"
-    },
-    {
-      "name": "bbbbb",
-      "hwid": "jhbbbb",
-      "exp_date": "2016-22-22"
-    }
-  ]
-}
+[{"hwid":"105124d591ddfbb7","name":"404","exp_date":"2026-01-19"}]
