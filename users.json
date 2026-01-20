@@ -1,14 +1,6 @@
 {
   "vip_users": [
-    {
-      "name": "LinLin",
-      "hwid": "46c231c1fcf1d8e9",
-      "exp_date": "2026-12-22"
-    },
-    {
-      "name": "nkka404",
-      "hwid": "105124d591ddfbb7",
-      "exp_date": "2026-01-25"
-    }
+    { "hwid": "105124d591ddfbb7", "name": "404", "exp_date": "2026-01-19" },
+    { "hwid": "46c231c1fcf1d8e9", "name": "LinLin", "exp_date": "2026-01-22" }
   ]
 }
