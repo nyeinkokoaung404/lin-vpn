@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP User Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-4 text-blue-600">VIP User Manager</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-blue-50 rounded">
+            <input type="password" id="ghToken" placeholder="GitHub Personal Access Token" class="border p-2 rounded w-full">
+            <input type="text" id="repoPath" placeholder="username/repo/path/to/users.json" class="border p-2 rounded w-full">
+            <button onclick="fetchUsers()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Load Data</button>
+        </div>
+
+        <hr class="my-6">
+
+        <div class="mb-6 border-b pb-6">
+            <h2 class="text-lg font-semibold mb-3">Add New VIP</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input type="text" id="newName" placeholder="Name" class="border p-2 rounded">
+                <input type="text" id="newHwid" placeholder="HWID" class="border p-2 rounded">
+                <input type="date" id="newExp" class="border p-2 rounded">
+            </div>
+            <button onclick="addUser()" class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full md:w-auto">Add to List</button>
+        </div>
+
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2 border">Name</th>
+                    <th class="p-2 border">HWID</th>
+                    <th class="p-2 border">Expiry</th>
+                    <th class="p-2 border">Action</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                </tbody>
+        </table>
+
+        <div class="mt-6">
+            <button onclick="saveToGithub()" id="saveBtn" class="hidden bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 w-full shadow-lg">
+                Save Changes to GitHub
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let userData = { vip_users: [] };
+        let currentSha = "";
+
+        // ၁။ GitHub မှ Data ဖတ်ခြင်း
+        async function fetchUsers() {
+            const token = document.getElementById('ghToken').value;
+            const repoPath = document.getElementById('repoPath').value; 
+            const url = `https://api.github.com/repos/${repoPath}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                currentSha = data.sha;
+                userData = JSON.parse(atob(data.content)); // Base64 decode
+                renderTable();
+                document.getElementById('saveBtn').classList.remove('hidden');
+                alert("Data Loaded!");
+            } catch (err) {
+                alert("Error fetching data. Check your token and repo path.");
+            }
+        }
+
+        // ၂။ Table ထဲမှာ User List ပြခြင်း
+        function renderTable() {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = "";
+            userData.vip_users.forEach((user, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-2 border">${user.name}</td>
+                        <td class="p-2 border">${user.hwid}</td>
+                        <td class="p-2 border">${user.exp_date}</td>
+                        <td class="p-2 border text-center">
+                            <button onclick="deleteUser(${index})" class="text-red-500 hover:underline">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ၃။ User အသစ်ထည့်ခြင်း (Local list ထဲကိုပဲ အရင်ထည့်တာ)
+        function addUser() {
+            const name = document.getElementById('newName').value;
+            const hwid = document.getElementById('newHwid').value;
+            const exp = document.getElementById('newExp').value;
+
+            if (name && hwid && exp) {
+                userData.vip_users.push({ hwid, name, exp_date: exp });
+                renderTable();
+                // Clear inputs
+                document.getElementById('newName').value = '';
+                document.getElementById('newHwid').value = '';
+            } else {
+                alert("Please fill all fields");
+            }
+        }
+
+        // ၄။ User ဖျက်ခြင်း
+        function deleteUser(index) {
+            userData.vip_users.splice(index, 1);
+            renderTable();
+        }
+
+        // ၅။ GitHub ဆီ Data ပြန်ပို့သိမ်းဆည်းခြင်း
+        async function saveToGithub() {
+            const token = document.getElementById('ghToken').value;
+            const repoPath = document.getElementById('repoPath').value;
+            const url = `https://api.github.com/repos/${repoPath}`;
+
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: "Update users via Admin Panel",
+                    content: btoa(JSON.stringify(userData, null, 2)),
+                    sha: currentSha
+                })
+            });
+
+            if (response.ok) {
+                const updatedData = await response.json();
+                currentSha = updatedData.content.sha; // Update SHA for next edit
+                alert("Successfully saved to GitHub!");
+            } else {
+                alert("Failed to save. Error: " + response.statusText);
+            }
+        }
+    </script>
+</body>
+</html>
