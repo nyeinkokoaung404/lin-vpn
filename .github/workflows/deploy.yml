@@ -14,13 +14,13 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
 
-      - name: 📦 Create build directory
+      - name: 📦 Prepare files
         run: |
           mkdir -p ./build
-          # 复制需要同步的文件到 build 目录
-          cp users.json config.json ./build/ 2>/dev/null || echo "Files not found, continuing..."
+          # 复制需要同步的文件
+          cp -f users.json config.json ./build/ 2>/dev/null || echo "Files copied or not found"
 
-      - name: 🚀 Sync files to Serv00
+      - name: 🚀 Sync files to Serv00 (SFTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -28,10 +28,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /public_html/404-vpn/
           local-dir: ./build/
-          # 根据您的服务器配置选择正确的协议
-          # 选项1：SFTP（通常使用端口22）
-          protocol: sftp
-          port: 22
-          # 或者选项2：FTP/FTPS
-          # protocol: ftps
-          # port: 21
+          protocol: sftp  # 重要：使用 SFTP 协议
+          port: 22        # SFTP 默认端口
+          # 可选：启用调试模式查看详细信息
+          # log-level: verbose
