@@ -1,0 +1,24 @@
+name: Sync to Serv00
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'users.json'
+      - 'config.json'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
+
+      - name: 🚀 Sync files to Serv00
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: domains/iam404.serv00.net/public_html/404-vpn/
+          local-dir: ./
