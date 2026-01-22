@@ -14,17 +14,24 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
 
+      - name: 📦 Create build directory
+        run: |
+          mkdir -p ./build
+          # 复制需要同步的文件到 build 目录
+          cp users.json config.json ./build/ 2>/dev/null || echo "Files not found, continuing..."
+
       - name: 🚀 Sync files to Serv00
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # Serv00 မှာ public_html ရဲ့ အရှေ့မှာ domain name သို့မဟုတ် domains/ ပါတတ်ပါတယ်
-          # ဥပမာ- domains/iam404.serv00.net/public_html/404-vpn/
-          server-dir: domains/iam404.serv00.net/public_html/404-vpn/
-          # local-dir ကို ./ လို့ပဲ ထားပါ (build folder မရှိလို့ပါ)
-          local-dir: ./
-          # Serv00 အတွက် standard ftp သုံးတာ အကောင်းဆုံးပါ
+          server-dir: /public_html/404-vpn/
+          local-dir: ./build/
+          # 根据您的服务器配置选择正确的协议
+          # 选项1：SFTP（通常使用端口22）
           protocol: sftp
           port: 22
+          # 或者选项2：FTP/FTPS
+          # protocol: ftps
+          # port: 21
