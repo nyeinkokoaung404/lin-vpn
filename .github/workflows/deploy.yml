@@ -26,5 +26,5 @@ jobs:
           # local-dir ကို ./ လို့ပဲ ထားပါ (build folder မရှိလို့ပါ)
           local-dir: ./
           # Serv00 အတွက် standard ftp သုံးတာ အကောင်းဆုံးပါ
-          protocol: ftp
-          port: 21
+          protocol: sftp
+          port: 22
