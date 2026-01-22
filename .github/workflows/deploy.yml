@@ -67,8 +67,8 @@ jobs:
           # Create lftp script
           cat > lftp_script.lftp <<EOF
           open sftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}:22
-          mkdir -p /public_html/404-vpn/
-          cd /public_html/404-vpn/
+          # mkdir -p /public_html/404-vpn/
+          cd domains/iam404.serv00.net/public_html/404-vpn/
           lcd ./deploy
           mirror -R -v --parallel=2
           bye
@@ -83,7 +83,7 @@ jobs:
         run: |
           echo "Verifying uploaded files..."
           sshpass -p "${{ secrets.FTP_PASSWORD }}" sftp -o StrictHostKeyChecking=no -P 22 ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }} <<EOF
-          cd /public_html/404-vpn/
+          cd domains/iam404.serv00.net/public_html/404-vpn/
           ls -la
           echo "=== File contents ==="
           [ -f "users.json" ] && echo "users.json exists" || echo "users.json not found"
