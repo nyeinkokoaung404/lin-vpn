@@ -1,19 +1,10 @@
-{
-  "vip_users": [
+{  "vip_users": [
     {
-      "hwid": "105124d591ddfbb7",
       "name": "404",
-      "exp_date": "2026-01-22"
-    },
-    {
-      "hwid": "46c231c1fcf1d8e9",
-      "name": "LINLIN",
-      "exp_date": "2026-01-30"
-    },
-    {
-      "hwid": "b39b8b2b045314cf",
-      "name": "THU",
-      "exp_date": "2027-01-01"
+      "username": "nkka404@#",
+      "password": "nkka404@#",
+      "hwid": "105124d591ddfbb7",
+      "exp_date": "2026-01-24"
     }
   ]
 }
