@@ -20,6 +20,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: domains/iam404.serv00.net/public_html/404-vpn/
-          protocol: ftp
-          local-dir: ./
+          server-dir: /public_html/404-vpn/
+          local-dir: ./build/
+          protocol: ftps
+          port: 22
