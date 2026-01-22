@@ -1,10 +1,18 @@
-{  "vip_users": [
+{
+  "vip_users": [
     {
       "name": "404",
       "username": "nkka404@#",
       "password": "nkka404@#",
       "hwid": "105124d591ddfbb7",
       "exp_date": "2026-01-24"
+    },
+    {
+      "name": "Channel 404",
+      "username": "nkka404",
+      "password": "nkka404",
+      "hwid": "1234567890",
+      "exp_date": "2026-01-23"
     }
   ]
 }
